@@ -7,6 +7,7 @@ import com.example.todolist.payload.xml.TaskXmlDto;
 import com.example.todolist.repository.TaskRepository;
 import com.example.todolist.repository.UserRepository;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,5 +56,16 @@ public class TaskService {
             }
         }
     }
+    @Transactional
+    public Task updateTaskDescription(Long taskId, String newDescription) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono zadania o ID: " + taskId));
+
+        // Ustawiamy nowy, długi tekst (jeśli null, zapisujemy pusty string dla bezpieczeństwa)
+        task.setDescription(newDescription == null ? "" : newDescription);
+
+        return taskRepository.save(task);
+    }
+
 
 }

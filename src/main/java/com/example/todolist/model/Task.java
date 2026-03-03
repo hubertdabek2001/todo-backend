@@ -13,6 +13,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tasks")
@@ -27,7 +29,7 @@ public class Task {
     @Column(nullable = false)
     private String title;
 
-
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "is_completed", columnDefinition = "boolean default false")
@@ -54,4 +56,10 @@ public class Task {
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private java.util.List<SubTask> subTasks = new java.util.ArrayList<>();
+
+    public Long getSpentTimeSeconds() {
+        return this.spentTimeSeconds == null ? 0L : this.spentTimeSeconds;
+    }
+
+
 }

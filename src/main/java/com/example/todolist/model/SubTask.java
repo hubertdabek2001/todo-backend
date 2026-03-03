@@ -53,4 +53,8 @@ public class SubTask {
     public Long getParentId() {
         return parentSubTask != null ? parentSubTask.getId() : null;
     }
+
+    public Long getSpentTimeSeconds() {
+        return this.spentTimeSeconds == null ? 0L : this.spentTimeSeconds;
+    }
 }

@@ -73,4 +73,11 @@ public class TodoList {
     @ColumnDefault("0")
     private Long spentTimeSeconds = 0L;
 
+    public Long getSpentTimeSeconds() {
+        return this.spentTimeSeconds == null ? 0L : this.spentTimeSeconds;
+    }
+
+    @ColumnDefault("false")
+    private Boolean isArchived = false;
+
 }

@@ -5,6 +5,7 @@ import com.example.todolist.model.User;
 import com.example.todolist.repository.TodoListRepository;
 import com.example.todolist.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -115,6 +116,20 @@ public class ListController {
         TodoList list = listRepository.findById(id).orElseThrow();
         list.setName(name);
         return listRepository.save(list);
+    }
+
+    @PatchMapping("/{listId}/archive")
+    public ResponseEntity<?> toggleArchiveStatus(@PathVariable Long listId, @RequestParam boolean archived) {
+        TodoList list = listRepository.findById(listId)
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono listy"));
+
+        // Zabezpieczenie: Sprawdź, czy lista należy do zalogowanego użytkownika
+        // (Wstaw tu swoją logikę walidacji użytkownika)
+
+        list.setIsArchived(archived);
+        listRepository.save(list);
+
+        return ResponseEntity.ok().body("Status archiwizacji listy został zaktualizowany.");
     }
 
 

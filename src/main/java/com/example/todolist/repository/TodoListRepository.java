@@ -6,4 +6,11 @@ import java.util.List;
 
 public interface TodoListRepository extends JpaRepository<TodoList, Long> {
     List<TodoList> findByUserId(Long userId);
+
+    // Pobiera TYLKO AKTYWNE listy dla danego użytkownika (do Sidebara)
+    List<TodoList> findByUserIdAndIsArchivedFalse(Long userId);
+
+    // Pobiera TYLKO ZARCHIWIZOWANE listy (do nowego ekranu Archiwum)
+    List<TodoList> findByUserIdAndIsArchivedTrue(Long userId);
+
 }

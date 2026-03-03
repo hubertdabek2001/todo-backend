@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -136,9 +137,54 @@ public class TaskController {
         return subTaskRepository.save(subTask);
     }
 
+    @PatchMapping("/{taskId}/description")
+    public ResponseEntity<?> updateTaskDescription(
+            @PathVariable Long taskId,
+            @RequestBody Map<String, String> payload) {
+
+        try {
+            // Wyciągamy wartość "description" z JSON-a
+            String description = payload.get("description");
+            Task updatedTask = taskService.updateTaskDescription(taskId, description);
+
+            return ResponseEntity.ok(updatedTask);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Błąd podczas zapisu notatki: " + e.getMessage());
+        }
+    }
+
     @DeleteMapping("subtasks/{subTaskId}")
     public ResponseEntity<?> deleteSubTask(@PathVariable Long subTaskId) {
         subTaskRepository.deleteById(subTaskId);
         return ResponseEntity.ok("SubTask deleted successfully");
+    }
+
+    @PatchMapping("/{taskId}/title")
+    public ResponseEntity<?> updateTaskTitle(
+            @PathVariable Long taskId,
+            @RequestParam String title) {
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono zadania o ID: " + taskId));
+
+        task.setTitle(title);
+        taskRepository.save(task);
+
+        return ResponseEntity.ok(task);
+    }
+
+    // --- AKTUALIZACJA TYTUŁU PODZADANIA ---
+    @PatchMapping("/subtasks/{subTaskId}/title")
+    public ResponseEntity<?> updateSubTaskTitle(
+            @PathVariable Long subTaskId,
+            @RequestParam String title) {
+
+        SubTask subTask = subTaskRepository.findById(subTaskId)
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono podzadania o ID: " + subTaskId));
+
+        subTask.setTitle(title);
+        subTaskRepository.save(subTask);
+
+        return ResponseEntity.ok(subTask);
     }
 }
