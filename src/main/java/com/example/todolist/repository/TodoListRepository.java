@@ -4,13 +4,13 @@ import com.example.todolist.model.TodoList;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
-public interface TodoListRepository extends JpaRepository<TodoList, Long> {
-    List<TodoList> findByUserId(Long userId);
+public interface TodoListRepository extends JpaRepository<TodoList, String> {
+    List<TodoList> findByUserId(String userId);
 
     // Pobiera TYLKO AKTYWNE listy dla danego użytkownika (do Sidebara)
-    List<TodoList> findByUserIdAndIsArchivedFalse(Long userId);
+    List<TodoList> findByUserIdAndIsArchivedFalse(String userId);
 
     // Pobiera TYLKO ZARCHIWIZOWANE listy (do nowego ekranu Archiwum)
-    List<TodoList> findByUserIdAndIsArchivedTrue(Long userId);
+    List<TodoList> findByUserIdAndIsArchivedTrue(String userId);
 
 }

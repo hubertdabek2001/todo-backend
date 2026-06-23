@@ -31,7 +31,7 @@ public class ListController {
     }
 
     @GetMapping("/{id}")
-    public TodoList getListById(@PathVariable Long id) {
+    public TodoList getListById(@PathVariable String id) {
         return listRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("List not found"));
     }
@@ -45,7 +45,7 @@ public class ListController {
     }
 
     @PatchMapping("/{id}/duedate")
-    public TodoList updateListDueDate(@PathVariable Long id, @RequestBody(required = false) LocalDateTime date) {
+    public TodoList updateListDueDate(@PathVariable String id, @RequestBody(required = false) LocalDateTime date) {
         TodoList list = listRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("List not found"));
         list.setDueDate(date);
@@ -54,7 +54,7 @@ public class ListController {
 
     @PatchMapping("/{id}/colors")
     public TodoList updateListColors(
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestParam String primary,
             @RequestParam String secondary,
             @RequestParam Boolean isDualColor,
@@ -71,7 +71,7 @@ public class ListController {
     }
 
     @PatchMapping("/{id}/width")
-    public TodoList updateListWidth(@PathVariable Long id, @RequestParam Integer width) {
+    public TodoList updateListWidth(@PathVariable String id, @RequestParam Integer width) {
         TodoList list = listRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("List not found"));
 
@@ -80,7 +80,7 @@ public class ListController {
     }
 
     @PatchMapping("/{id}/height")
-    public TodoList updateListHeight(@PathVariable Long id, @RequestParam Integer height) {
+    public TodoList updateListHeight(@PathVariable String id, @RequestParam Integer height) {
         TodoList list = listRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("List not found"));
 
@@ -89,7 +89,7 @@ public class ListController {
     }
 
     @PatchMapping("/{id}/position")
-    public TodoList updateListPosition(@PathVariable Long id, @RequestParam Integer x, @RequestParam Integer y) {
+    public TodoList updateListPosition(@PathVariable String id, @RequestParam Integer x, @RequestParam Integer y) {
         TodoList list = listRepository.findById(id).orElseThrow();
         list.setPosX(x);
         list.setPosY(y);
@@ -98,28 +98,28 @@ public class ListController {
 
     // Aktualizacja stanu minimalizacji
     @PatchMapping("/{id}/minimize")
-    public TodoList toggleMinimize(@PathVariable Long id, @RequestParam Boolean minimized) {
+    public TodoList toggleMinimize(@PathVariable String id, @RequestParam Boolean minimized) {
         TodoList list = listRepository.findById(id).orElseThrow();
         list.setIsMinimized(minimized);
         return listRepository.save(list);
     }
 
     @PatchMapping("/{id}/open")
-    public TodoList updateListOpenStatus(@PathVariable Long id, @RequestParam Boolean isOpen) {
+    public TodoList updateListOpenStatus(@PathVariable String id, @RequestParam Boolean isOpen) {
         TodoList list = listRepository.findById(id).orElseThrow();
         list.setIsOpen(isOpen);
         return listRepository.save(list);
     }
 
     @PatchMapping("/{id}/name")
-    public TodoList updateListName(@PathVariable Long id, @RequestParam String name) {
+    public TodoList updateListName(@PathVariable String id, @RequestParam String name) {
         TodoList list = listRepository.findById(id).orElseThrow();
         list.setName(name);
         return listRepository.save(list);
     }
 
     @PatchMapping("/{listId}/archive")
-    public ResponseEntity<?> toggleArchiveStatus(@PathVariable Long listId, @RequestParam boolean archived) {
+    public ResponseEntity<?> toggleArchiveStatus(@PathVariable String listId, @RequestParam boolean archived) {
         TodoList list = listRepository.findById(listId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono listy"));
 

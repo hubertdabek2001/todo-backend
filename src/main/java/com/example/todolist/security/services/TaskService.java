@@ -57,7 +57,7 @@ public class TaskService {
         }
     }
     @Transactional
-    public Task updateTaskDescription(Long taskId, String newDescription) {
+    public Task updateTaskDescription(String taskId, String newDescription) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono zadania o ID: " + taskId));
 

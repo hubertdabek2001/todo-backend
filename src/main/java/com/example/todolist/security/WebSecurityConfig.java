@@ -62,10 +62,10 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                            auth.requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/api/test/**").permitAll()
-                                .anyRequest().authenticated()
-                );
+                auth.requestMatchers("/api/auth/request-otp", "/api/auth/verify-otp").permitAll()
+                        .requestMatchers("/api/test/**").permitAll()
+                        .anyRequest().authenticated()
+        );
 
 
         http.authenticationProvider(authenticationProvider());
@@ -78,16 +78,14 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Zezwól na połączenia z Twojego Frontendu (Vite)
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        // ZMIANA: Zezwalamy na KAŻDE źródło (niezbędne dla apek mobilnych w sieci lokalnej)
+        configuration.setAllowedOriginPatterns(List.of("*"));
 
-        // Zezwól na metody HTTP
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 
-        // Zezwól na nagłówki (w tym Authorization!)
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "x-auth-token"));
+        // ZMIANA: Zezwalamy na każdy nagłówek
+        configuration.setAllowedHeaders(List.of("*"));
 
-        // Pozwól na przesyłanie ciasteczek/credentials (opcjonalne, ale przydatne)
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

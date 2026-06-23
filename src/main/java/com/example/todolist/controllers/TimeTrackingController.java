@@ -24,7 +24,7 @@ public class TimeTrackingController {
     // DTO do requestu
     public static class StartTimeRequest {
         public String type; // "LIST", "TASK", "SUBTASK"
-        public Long entityId;
+        public String entityId;
     }
 
     public static class ManualTimeRequest extends StartTimeRequest {
@@ -37,7 +37,7 @@ public class TimeTrackingController {
     }
 
     @PostMapping("/stop/{logId}")
-    public ResponseEntity<TimeLog> stopTimer(@PathVariable Long logId) {
+    public ResponseEntity<TimeLog> stopTimer(@PathVariable String logId) {
         return ResponseEntity.ok(timeTrackingService.stopTimer(logId));
     }
 
@@ -48,7 +48,7 @@ public class TimeTrackingController {
 
     // Pobranie AKTYWNEGO timera dla danego elementu (potrzebne, aby po odświeżeniu strony w React stoper nadal leciał)
     @GetMapping("/active/{type}/{entityId}")
-    public ResponseEntity<TimeLog> getActiveTimer(@PathVariable String type, @PathVariable Long entityId) {
+    public ResponseEntity<TimeLog> getActiveTimer(@PathVariable String type, @PathVariable String entityId) {
         Optional<TimeLog> activeLog = Optional.empty();
         switch (type.toUpperCase()) {
             case "LIST": activeLog = timeLogRepository.findByTodoListIdAndEndTimeIsNull(entityId); break;
@@ -60,7 +60,7 @@ public class TimeTrackingController {
 
     // Historia czasu
     @GetMapping("/history/{type}/{entityId}")
-    public ResponseEntity<List<TimeLog>> getHistory(@PathVariable String type, @PathVariable Long entityId) {
+    public ResponseEntity<List<TimeLog>> getHistory(@PathVariable String type, @PathVariable String entityId) {
         switch (type.toUpperCase()) {
             case "LIST": return ResponseEntity.ok(timeLogRepository.findByTodoListIdOrderByStartTimeDesc(entityId));
             case "TASK": return ResponseEntity.ok(timeLogRepository.findByTaskIdOrderByStartTimeDesc(entityId));

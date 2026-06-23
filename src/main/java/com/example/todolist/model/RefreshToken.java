@@ -15,8 +15,14 @@ import java.time.Instant;
 public class RefreshToken {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.id == null) {
+            this.id = java.util.UUID.randomUUID().toString();
+        }
+    }
 
     @Column(nullable = false, unique = true)
     private String token;

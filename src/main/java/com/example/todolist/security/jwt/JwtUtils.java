@@ -61,4 +61,13 @@ public class JwtUtils {
         return false;
     }
 
+    public String generateJwtTokenFromEmail(String email){
+        return Jwts.builder()
+                .setSubject(email) // Używamy e-maila
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(key(), SignatureAlgorithm.HS512)
+                .compact();
+    }
+
 }

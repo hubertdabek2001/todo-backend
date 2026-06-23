@@ -20,8 +20,14 @@ import java.util.List;
 
 public class SubTask {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.id == null) {
+            this.id = java.util.UUID.randomUUID().toString();
+        }
+    }
 
     private String title;
 
@@ -50,7 +56,7 @@ public class SubTask {
     private List<SubTask> children = new ArrayList<>();
 
     @JsonProperty("parentId")
-    public Long getParentId() {
+    public String getParentId() {
         return parentSubTask != null ? parentSubTask.getId() : null;
     }
 

@@ -16,8 +16,14 @@ import java.util.List;
 @NoArgsConstructor
 public class TodoList {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.id == null) {
+            this.id = java.util.UUID.randomUUID().toString();
+        }
+    }
 
     private String name;
 

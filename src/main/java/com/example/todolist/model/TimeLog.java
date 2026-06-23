@@ -16,8 +16,14 @@ import java.time.LocalDateTime;
 public class TimeLog {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.id == null) {
+            this.id = java.util.UUID.randomUUID().toString();
+        }
+    }
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;

@@ -5,11 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface TaskRepository extends JpaRepository<Task, Long> {
+public interface TaskRepository extends JpaRepository<Task, String> {
 
-    List<Task> findByUserId(Long userId);
+    List<Task> findByUserId(String userId);
 
-    List<Task> findByTodoListId(Long todoListId);
+    List<Task> findByTodoListId(String todoListId);
 
-    List<Task> findByUserIdAndIsCompleted(Long userId, boolean isCompleted);
+    List<Task> findByUserIdAndIsCompleted(String userId, boolean isCompleted);
 }

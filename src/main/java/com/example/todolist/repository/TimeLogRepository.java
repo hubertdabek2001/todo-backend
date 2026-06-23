@@ -9,15 +9,15 @@ import java.util.Optional;
 import java.util.List;
 
 @Repository
-public interface TimeLogRepository extends JpaRepository<TimeLog, Long> {
+public interface TimeLogRepository extends JpaRepository<TimeLog, String> {
 
     // Szukanie aktywnego stopera (bez endTime) dla konkretnego elementu
-    Optional<TimeLog> findByTodoListIdAndEndTimeIsNull(Long listId);
-    Optional<TimeLog> findByTaskIdAndEndTimeIsNull(Long taskId);
-    Optional<TimeLog> findBySubTaskIdAndEndTimeIsNull(Long subTaskId);
+    Optional<TimeLog> findByTodoListIdAndEndTimeIsNull(String listId);
+    Optional<TimeLog> findByTaskIdAndEndTimeIsNull(String taskId);
+    Optional<TimeLog> findBySubTaskIdAndEndTimeIsNull(String subTaskId);
 
     // Historia logów
-    List<TimeLog> findByTodoListIdOrderByStartTimeDesc(Long listId);
-    List<TimeLog> findByTaskIdOrderByStartTimeDesc(Long taskId);
-    List<TimeLog> findBySubTaskIdOrderByStartTimeDesc(Long subTaskId);
+    List<TimeLog> findByTodoListIdOrderByStartTimeDesc(String listId);
+    List<TimeLog> findByTaskIdOrderByStartTimeDesc(String taskId);
+    List<TimeLog> findBySubTaskIdOrderByStartTimeDesc(String subTaskId);
 }

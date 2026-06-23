@@ -24,7 +24,7 @@ public class TimeTrackingService {
     @Autowired private SubTaskRepository subTaskRepository;
 
     // --- START TIMERA ---
-    public TimeLog startTimer(String type, Long entityId) {
+    public TimeLog startTimer(String type, String entityId) {
         TimeLog log = new TimeLog();
         log.setStartTime(LocalDateTime.now());
 
@@ -53,7 +53,7 @@ public class TimeTrackingService {
 
     // --- STOP TIMERA ---
     @Transactional
-    public TimeLog stopTimer(Long logId) {
+    public TimeLog stopTimer(String logId) {
         TimeLog log = timeLogRepository.findById(logId)
                 .orElseThrow(() -> new RuntimeException("Log not found"));
 
@@ -73,7 +73,7 @@ public class TimeTrackingService {
 
     // --- DODAWANIE MANUALNE ---
     @Transactional
-    public TimeLog addManualTime(String type, Long entityId, Long durationSeconds) {
+    public TimeLog addManualTime(String type, String entityId, Long durationSeconds) {
         TimeLog log = new TimeLog();
         log.setEndTime(LocalDateTime.now());
         log.setStartTime(LocalDateTime.now().minusSeconds(durationSeconds));

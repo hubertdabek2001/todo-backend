@@ -53,7 +53,7 @@ public class TaskController {
     }
 
     @GetMapping({"/list/{listId}"})
-    public List<Task> getTasksByList(@PathVariable Long listId) {
+    public List<Task> getTasksByList(@PathVariable String listId) {
     return taskRepository.findByTodoListId(listId);
     }
 
@@ -63,7 +63,7 @@ public class TaskController {
     }
 
     @PostMapping("/list/{listId}")
-    public Task addTaskToList(@PathVariable Long listId, @RequestBody Task task) {
+    public Task addTaskToList(@PathVariable String listId, @RequestBody Task task) {
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username).orElseThrow();
@@ -87,7 +87,7 @@ public class TaskController {
     }
 
     @PostMapping("/{taskId}/subtasks")
-    public SubTask addSubTask(@PathVariable Long taskId, @RequestBody SubTask subTask) {
+    public SubTask addSubTask(@PathVariable String taskId, @RequestBody SubTask subTask) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
         subTask.setTask(task);
@@ -95,7 +95,7 @@ public class TaskController {
     }
 
     @PostMapping("/subtasks/{parentSubTaskId}/add")
-    public SubTask addNestedSubTask(@PathVariable Long parentSubTaskId, @RequestBody SubTask subTask) {
+    public SubTask addNestedSubTask(@PathVariable String parentSubTaskId, @RequestBody SubTask subTask) {
         SubTask parent = subTaskRepository.findById(parentSubTaskId)
                 .orElseThrow(() -> new RuntimeException("Parent SubTask not found"));
         subTask.setParentSubTask(parent);
@@ -104,7 +104,7 @@ public class TaskController {
     }
 
     @PatchMapping("/subtasks/{subTaskId}/toggle")
-    public SubTask toggleSubTask(@PathVariable Long subTaskId) {
+    public SubTask toggleSubTask(@PathVariable String subTaskId) {
         SubTask subTask = subTaskRepository.findById(subTaskId)
                 .orElseThrow(() -> new RuntimeException("SubTask not found"));
 
@@ -114,7 +114,7 @@ public class TaskController {
     }
 
     @PatchMapping({"/{taskId}/toggle"})
-    public Task toggleTaskStatus(@PathVariable Long taskId) {
+    public Task toggleTaskStatus(@PathVariable String taskId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
         task.setIsCompleted(!task.getIsCompleted());
@@ -122,7 +122,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{taskId}/duedate")
-    public Task updateTaskDueDate(@PathVariable Long taskId, @RequestBody(required = false) LocalDateTime date) {
+    public Task updateTaskDueDate(@PathVariable String taskId, @RequestBody(required = false) LocalDateTime date) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
         task.setDueDate(date);
@@ -130,7 +130,7 @@ public class TaskController {
     }
 
     @PatchMapping("/subtasks/{subTaskId}/duedate")
-    public SubTask updateSubTaskDueDate(@PathVariable Long subTaskId, @RequestBody(required = false) LocalDateTime date) {
+    public SubTask updateSubTaskDueDate(@PathVariable String subTaskId, @RequestBody(required = false) LocalDateTime date) {
         SubTask subTask = subTaskRepository.findById(subTaskId)
                 .orElseThrow(() -> new RuntimeException("SubTask not found"));
         subTask.setDueDate(date);
@@ -139,7 +139,7 @@ public class TaskController {
 
     @PatchMapping("/{taskId}/description")
     public ResponseEntity<?> updateTaskDescription(
-            @PathVariable Long taskId,
+            @PathVariable String taskId,
             @RequestBody Map<String, String> payload) {
 
         try {
@@ -154,14 +154,14 @@ public class TaskController {
     }
 
     @DeleteMapping("subtasks/{subTaskId}")
-    public ResponseEntity<?> deleteSubTask(@PathVariable Long subTaskId) {
+    public ResponseEntity<?> deleteSubTask(@PathVariable String subTaskId) {
         subTaskRepository.deleteById(subTaskId);
         return ResponseEntity.ok("SubTask deleted successfully");
     }
 
     @PatchMapping("/{taskId}/title")
     public ResponseEntity<?> updateTaskTitle(
-            @PathVariable Long taskId,
+            @PathVariable String taskId,
             @RequestParam String title) {
 
         Task task = taskRepository.findById(taskId)
@@ -176,7 +176,7 @@ public class TaskController {
     // --- AKTUALIZACJA TYTUŁU PODZADANIA ---
     @PatchMapping("/subtasks/{subTaskId}/title")
     public ResponseEntity<?> updateSubTaskTitle(
-            @PathVariable Long subTaskId,
+            @PathVariable String subTaskId,
             @RequestParam String title) {
 
         SubTask subTask = subTaskRepository.findById(subTaskId)
