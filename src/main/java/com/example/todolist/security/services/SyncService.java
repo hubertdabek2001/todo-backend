@@ -11,6 +11,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -143,5 +145,53 @@ public class SyncService {
                 }
             }
         }
+    }
+    @Transactional(readOnly = true)
+    public Map<String, Object> pullData(User currentUser) {
+        List<TodoList> userLists = listRepo.findAllByOwnerOrCollaborator(currentUser);
+
+        List<Task> userTasks = userLists.isEmpty() ?
+                List.of() : taskRepo.findByTodoListIn(userLists);
+
+        List<SubTask> userSubTasks = userTasks.isEmpty() ?
+                List.of() : subTaskRepo.findByTaskIn(userTasks);
+
+        // JAWNY ŚWIADEK TYPU Map.<String, Object>of zapobiega błędnej inferencji typów przez kompilator
+        List<Map<String, Object>> listsDto = userLists.stream().map(l -> Map.<String, Object>of(
+                "id", l.getId(),
+                "name", l.getName(),
+                "isArchived", l.getIsArchived() != null ? l.getIsArchived() : false,
+                "spentTimeSeconds", l.getSpentTimeSeconds() != null ? l.getSpentTimeSeconds() : 0L,
+                "isShared", !l.getCollaborators().isEmpty()
+        )).toList();
+
+        // JAWNY ŚWIADEK TYPU Map.<String, Object>of również tutaj
+        List<Map<String, Object>> tasksDto = userTasks.stream().map(t -> Map.<String, Object>of(
+                "id", t.getId(),
+                "todoListId", t.getTodoList().getId(),
+                "title", t.getTitle(),
+                "isCompleted", t.getIsCompleted() != null ? t.getIsCompleted() : false,
+                "spentTimeSeconds", t.getSpentTimeSeconds() != null ? t.getSpentTimeSeconds() : 0L
+        )).toList();
+
+        // Tutaj używamy HashMap, więc typ generyczny jest od początku twardo określony
+        List<Map<String, Object>> subTasksDto = userSubTasks.stream().map(st -> {
+            Map<String, Object> map = new java.util.HashMap<>();
+            map.put("id", st.getId());
+            map.put("taskId", st.getTask().getId());
+            map.put("title", st.getTitle());
+            map.put("isCompleted", st.getIsCompleted() != null ? st.getIsCompleted() : false);
+            map.put("spentTimeSeconds", st.getSpentTimeSeconds() != null ? st.getSpentTimeSeconds() : 0L);
+            if (st.getParentSubTask() != null) {
+                map.put("parentSubTaskId", st.getParentSubTask().getId());
+            }
+            return map;
+        }).toList();
+
+        return Map.of(
+                "lists", listsDto,
+                "tasks", tasksDto,
+                "subTasks", subTasksDto
+        );
     }
 }

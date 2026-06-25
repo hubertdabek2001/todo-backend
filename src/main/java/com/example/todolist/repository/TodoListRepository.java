@@ -1,7 +1,11 @@
 package com.example.todolist.repository;
 
 import com.example.todolist.model.TodoList;
+import com.example.todolist.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 
 public interface TodoListRepository extends JpaRepository<TodoList, String> {
@@ -12,5 +16,8 @@ public interface TodoListRepository extends JpaRepository<TodoList, String> {
 
     // Pobiera TYLKO ZARCHIWIZOWANE listy (do nowego ekranu Archiwum)
     List<TodoList> findByUserIdAndIsArchivedTrue(String userId);
+
+    @Query("SELECT DISTINCT l FROM TodoList l LEFT JOIN l.collaborators c WHERE l.user = :user OR c = :user")
+    List<TodoList> findAllByOwnerOrCollaborator(@Param("user") User user);
 
 }

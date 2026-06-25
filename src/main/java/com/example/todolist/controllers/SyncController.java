@@ -39,4 +39,13 @@ public class SyncController {
 
         return ResponseEntity.ok(Map.of("message", "Synchronizacja zakończona pomyślnie."));
     }
+
+    @GetMapping("/pull")
+    public ResponseEntity<?> pullSyncData(Authentication authentication) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        User currentUser = userRepository.findByEmail(userDetails.getEmail())
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono usera"));
+
+        return ResponseEntity.ok(syncService.pullData(currentUser));
+    }
 }
