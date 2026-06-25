@@ -25,6 +25,9 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    private String firstName;
+    private String lastName;
+
     private String role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

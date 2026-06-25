@@ -62,8 +62,9 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                auth.requestMatchers("/api/auth/request-otp", "/api/auth/verify-otp").permitAll()
+                auth.requestMatchers("/api/auth/request-otp", "/api/auth/verify-otp", "/api/auth/refresh-token").permitAll()
                         .requestMatchers("/api/test/**").permitAll()
+                        .requestMatchers("/ws-todo", "/ws-todo/**").permitAll()
                         .anyRequest().authenticated()
         );
 

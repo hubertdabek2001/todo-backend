@@ -3,12 +3,15 @@ package com.example.todolist.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "todo_lists")
@@ -85,5 +88,15 @@ public class TodoList {
 
     @ColumnDefault("false")
     private Boolean isArchived = false;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "list_collaborators",
+            joinColumns = @JoinColumn(name = "list_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @EqualsAndHashCode.Exclude // Ważne: zapobiega zapętleniu metody equals w Lombok
+    @JsonIgnore
+    private Set<User> collaborators = new HashSet<>();
 
 }

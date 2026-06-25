@@ -1,37 +1,33 @@
+// src/main/java/com/example/todolist/model/RefreshToken.java
 package com.example.todolist.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "refresh_tokens")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class RefreshToken {
-
     @Id
     private String id;
 
-    @PrePersist
-    protected void onCreate() {
-        if (this.id == null) {
-            this.id = java.util.UUID.randomUUID().toString();
-        }
-    }
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
     @Column(nullable = false, unique = true)
     private String token;
 
+    @Column(nullable = false)
     private Instant expiryDate;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
-
-
+    @PrePersist
+    protected void onCreate() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
+    }
 }
