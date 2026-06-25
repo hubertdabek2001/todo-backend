@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -44,8 +45,12 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                         UsernamePasswordAuthenticationToken authentication =
                                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-                        accessor.setUser(authentication);
+                        StompHeaderAccessor mutableAccessor = StompHeaderAccessor.wrap(message);
+                        mutableAccessor.setUser(authentication);
                         System.out.println("[WEBSOCKET] ✅ Pomyślnie uwierzytelniono sesję WebSocket!");
+                        System.out.println("=================================================");
+
+                        return MessageBuilder.createMessage(message.getPayload(), mutableAccessor.getMessageHeaders());
                     } else {
                         System.out.println("[WEBSOCKET] ❌ UWAGA: Token JWT jest nieprawidłowy lub wygasł!");
                     }
