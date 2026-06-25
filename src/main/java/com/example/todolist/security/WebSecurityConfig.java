@@ -64,6 +64,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth ->
                 auth.requestMatchers("/api/auth/request-otp", "/api/auth/verify-otp").permitAll()
                         .requestMatchers("/api/test/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated()
         );
 
