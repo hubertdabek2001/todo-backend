@@ -16,6 +16,9 @@ public class OtpService {
     @Autowired
     private OtpTokenRepository otpTokenRepository;
 
+    @Autowired
+    private EmailService emailService;
+
     @Transactional
     public void generateAndSendOtp(String email) {
         // Usuwamy stare kody dla tego e-maila
@@ -30,7 +33,9 @@ public class OtpService {
         otpToken.setExpiryDate(LocalDateTime.now().plusMinutes(10)); // Ważny 10 minut
         otpTokenRepository.save(otpToken);
 
-        // TODO: Tutaj podepnij wysyłkę Email (JavaMailSender)
+        // Wyślij e-mail z kodem OTP
+        emailService.sendOtpEmail(email, code);
+
         System.out.println("=================================================");
         System.out.println("WYGENEROWANO KOD OTP DLA " + email + ": " + code);
         System.out.println("=================================================");
