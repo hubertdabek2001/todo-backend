@@ -4,13 +4,18 @@ import com.example.todolist.model.TodoList;
 import com.example.todolist.model.User;
 import com.example.todolist.repository.TodoListRepository;
 import com.example.todolist.repository.UserRepository;
+import com.example.todolist.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/lists")
@@ -132,6 +137,72 @@ public class ListController {
         return ResponseEntity.ok().body("Status archiwizacji listy został zaktualizowany.");
     }
 
+    @GetMapping("/{id}/collaborators")
+    public ResponseEntity<?> getListCollaborators(@PathVariable String id) {
+        TodoList list = listRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono listy"));
+
+        List<User> allMembers = new ArrayList<>();
+        allMembers.add(list.getUser()); // Właściciel
+        allMembers.addAll(list.getCollaborators()); // Współpracownicy
+
+        // Mapowanie na prosty JSON z inicjałami
+        List<Map<String, String>> response = allMembers.stream().map(user -> {
+            String initial = "U";
+            if (user.getFirstName() != null && !user.getFirstName().isEmpty()) {
+                initial = user.getFirstName().substring(0, 1).toUpperCase();
+            } else if (user.getUsername() != null && !user.getUsername().isEmpty()) {
+                initial = user.getUsername().substring(0, 1).toUpperCase();
+            }
+
+            return Map.of(
+                    "id", user.getId(),
+                    "initial", initial
+            );
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}/archive")
+    public ResponseEntity<?> archiveList(@PathVariable String id) {
+        TodoList list = listRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono listy"));
+        list.setIsArchived(true);
+        listRepository.save(list);
+        return ResponseEntity.ok(Map.of("message", "Zarchiwizowano pomyślnie"));
+    }
+
+    // 2. PRZYWRACANIE LISTY
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<?> restoreList(@PathVariable String id) {
+        TodoList list = listRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono listy"));
+        list.setIsArchived(false);
+        listRepository.save(list);
+        return ResponseEntity.ok(Map.of("message", "Przywrócono pomyślnie"));
+    }
+
+    // 3. POBIERANIE ZARCHIWIZOWANYCH LIST
+    @GetMapping("/archived")
+    public ResponseEntity<?> getArchivedLists(Authentication authentication) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        User currentUser = userRepository.findByEmail(userDetails.getEmail())
+                .orElseThrow(() -> new RuntimeException("Nie znaleziono usera"));
+
+        // Pobieramy wszystkie listy (własne i udostępnione)
+        List<TodoList> allLists = listRepository.findAllByOwnerOrCollaborator(currentUser);
+
+        // Zwracamy tylko te zarchiwizowane
+        List<Map<String, Object>> archived = allLists.stream()
+                .filter(l -> l.getIsArchived() != null && l.getIsArchived())
+                .map(l -> Map.<String, Object>of(
+                        "id", l.getId(),
+                        "name", l.getName()
+                )).collect(Collectors.toList());
+
+        return ResponseEntity.ok(archived);
+    }
 
 
 
