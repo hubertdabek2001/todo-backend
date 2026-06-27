@@ -1,6 +1,7 @@
 package com.example.todolist.controllers;
 
 
+import com.example.todolist.security.services.UserDetailsImpl;
 import com.example.todolist.model.SubTask;
 import com.example.todolist.model.Task;
 import com.example.todolist.model.TodoList;
@@ -43,8 +44,8 @@ public class TaskController {
     private SubTaskRepository subTaskRepository;
 
     private String getCurrentUsername() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getName(); // Placeholder, replace with actual implementation
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userDetails.getEmail();
     }
 
     @GetMapping
@@ -65,8 +66,9 @@ public class TaskController {
     @PostMapping("/list/{listId}")
     public Task addTaskToList(@PathVariable String listId, @RequestBody Task task) {
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username).orElseThrow();
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userDetails.getEmail();
+        User user = userRepository.findByEmail(email).orElseThrow();
 
         TodoList list = todoListRepository.findById(listId)
                 .orElseThrow(() -> new RuntimeException("List not found"));
