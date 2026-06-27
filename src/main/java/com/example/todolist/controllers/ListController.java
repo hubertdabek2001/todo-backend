@@ -30,9 +30,10 @@ public class ListController {
 
     @GetMapping
     public List<TodoList> getUserLists() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username).orElseThrow();
-        return listRepository.findByUserId(user.getId());
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userDetails.getEmail();
+        User user = userRepository.findByEmail(email).orElseThrow();
+        return listRepository.findAllByOwnerOrCollaborator(user);
     }
 
     @GetMapping("/{id}")
@@ -43,8 +44,9 @@ public class ListController {
 
     @PostMapping
     public TodoList createList(@RequestBody TodoList list) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username).orElseThrow();
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userDetails.getEmail();
+        User user = userRepository.findByEmail(email).orElseThrow();
         list.setUser(user);
         return listRepository.save(list);
     }

@@ -24,21 +24,21 @@ public class TaskService {
     @Autowired
     private UserRepository userRepository;
 
-    public List<Task> getAllTasks(String username) {
-        User user = userRepository.findByUsername(username)
+    public List<Task> getAllTasks(String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return taskRepository.findByUserId(user.getId());
     }
 
-    public Task saveTask(Task task, String username) {
-        User user = userRepository.findByUsername(username)
+    public Task saveTask(Task task, String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         task.setUser(user);
         return taskRepository.save(task);
     }
 
-    public void importTasksFromXml(MultipartFile file, String username) throws IOException {
-        User user = userRepository.findByUsername(username)
+    public void importTasksFromXml(MultipartFile file, String email) throws IOException {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         XmlMapper xmlMapper = new XmlMapper();

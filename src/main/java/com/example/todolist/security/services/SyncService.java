@@ -35,7 +35,7 @@ public class SyncService {
         log.setEntityName(name);
         activityLogRepo.save(log);
 
-        messagingTemplate.convertAndSend("/topic/list" + listId, log);
+        messagingTemplate.convertAndSend("/topic/list/" + listId, log);
     }
 
     @Transactional
