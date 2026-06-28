@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -24,6 +25,9 @@ public class EmailService {
     @Autowired
     private ResourceLoader resourceLoader;
 
+    @Value("${spring.mail.username}")
+    private String senderEmail;
+
     public void sendOtpEmail(String to, String otpCode) {
         try {
             // Load the HTML template
@@ -40,6 +44,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
+            helper.setFrom(senderEmail);
             helper.setTo(to);
             helper.setSubject("Your Verification Code");
             helper.setText(htmlContent, true);
