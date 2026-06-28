@@ -15,4 +15,6 @@ public interface TaskRepository extends JpaRepository<Task, String> {
     List<Task> findByUserIdAndIsCompleted(String userId, boolean isCompleted);
 
     List<Task> findByTodoListIn(List<TodoList> lists);
+
+    List<Task> findByUserIdOrTodoListIn(String userId, List<TodoList> lists);
 }

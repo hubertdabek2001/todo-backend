@@ -98,6 +98,8 @@ public class SyncService {
 
                 if (dto.getTodoListId() != null) {
                     listRepo.findById(dto.getTodoListId()).ifPresent(task::setTodoList);
+                } else {
+                    task.setTodoList(null);
                 }
 
                 taskRepo.save(task);
@@ -151,30 +153,33 @@ public class SyncService {
         List<TodoList> userLists = listRepo.findAllByOwnerOrCollaborator(currentUser);
 
         List<Task> userTasks = userLists.isEmpty() ?
-                List.of() : taskRepo.findByTodoListIn(userLists);
+                taskRepo.findByUserId(currentUser.getId()) :
+                taskRepo.findByUserIdOrTodoListIn(currentUser.getId(), userLists);
 
         List<SubTask> userSubTasks = userTasks.isEmpty() ?
                 List.of() : subTaskRepo.findByTaskIn(userTasks);
 
-        // JAWNY ŚWIADEK TYPU Map.<String, Object>of zapobiega błędnej inferencji typów przez kompilator
-        List<Map<String, Object>> listsDto = userLists.stream().map(l -> Map.<String, Object>of(
-                "id", l.getId(),
-                "name", l.getName(),
-                "isArchived", l.getIsArchived() != null ? l.getIsArchived() : false,
-                "spentTimeSeconds", l.getSpentTimeSeconds() != null ? l.getSpentTimeSeconds() : 0L,
-                "isShared", !l.getCollaborators().isEmpty()
-        )).toList();
+        List<Map<String, Object>> listsDto = userLists.stream().map(l -> {
+            Map<String, Object> map = new java.util.HashMap<>();
+            map.put("id", l.getId());
+            map.put("name", l.getName());
+            map.put("isArchived", l.getIsArchived() != null ? l.getIsArchived() : false);
+            map.put("spentTimeSeconds", l.getSpentTimeSeconds() != null ? l.getSpentTimeSeconds() : 0L);
+            map.put("isShared", !l.getCollaborators().isEmpty());
+            return map;
+        }).toList();
 
-        // JAWNY ŚWIADEK TYPU Map.<String, Object>of również tutaj
-        List<Map<String, Object>> tasksDto = userTasks.stream().map(t -> Map.<String, Object>of(
-                "id", t.getId(),
-                "todoListId", t.getTodoList().getId(),
-                "title", t.getTitle(),
-                "isCompleted", t.getIsCompleted() != null ? t.getIsCompleted() : false,
-                "spentTimeSeconds", t.getSpentTimeSeconds() != null ? t.getSpentTimeSeconds() : 0L
-        )).toList();
+        List<Map<String, Object>> tasksDto = userTasks.stream().map(t -> {
+            Map<String, Object> map = new java.util.HashMap<>();
+            map.put("id", t.getId());
+            map.put("todoListId", t.getTodoList() != null ? t.getTodoList().getId() : null);
+            map.put("title", t.getTitle());
+            map.put("description", t.getDescription());
+            map.put("isCompleted", t.getIsCompleted() != null ? t.getIsCompleted() : false);
+            map.put("spentTimeSeconds", t.getSpentTimeSeconds() != null ? t.getSpentTimeSeconds() : 0L);
+            return map;
+        }).toList();
 
-        // Tutaj używamy HashMap, więc typ generyczny jest od początku twardo określony
         List<Map<String, Object>> subTasksDto = userSubTasks.stream().map(st -> {
             Map<String, Object> map = new java.util.HashMap<>();
             map.put("id", st.getId());
